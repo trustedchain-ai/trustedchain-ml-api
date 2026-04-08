@@ -1,0 +1,17 @@
+signature_hash_algo,signature_key_algo,public_key_algo,public_key_size,can_issue,pathlen,has_roca,common_name,issuer_dn,not_after,eku,san,label
+SHA-256,RSA,RSA,2048,f,0,f,google.com,"CN=Google Trust Services",2026-12-31,serverAuth,"*.google.com",benign
+SHA-512,RSA,RSA,4096,f,0,f,microsoft.com,"CN=Microsoft RSA TLS CA",2026-12-31,serverAuth,"*.microsoft.com",benign
+SHA-384,ECDSA,EC,256,f,0,f,apple.com,"CN=Apple Public CA",2026-12-31,serverAuth,"*.apple.com",benign
+SHA-256,RSA,RSA,3072,f,0,f,cloudflare.com,"CN=Cloudflare Inc ECC CA-3",2027-01-01,serverAuth,"*.cloudflare.com",benign
+SHA-256,RSA,RSA,2048,f,0,f,amazon.com,"CN=Amazon RSA 2048 M02",2026-09-30,serverAuth,"*.amazon.com",benign
+SHA-1,RSA,RSA,1024,t,5,t,unknown-domain.xyz,"CN=Unknown CA",2024-01-01,anyExtendedKeyUsage,,suspicious
+MD5,RSA,RSA,512,t,10,t,free-downloads.biz,"CN=Untrusted Authority",2023-01-01,codeSigning,,malicious
+SHA-1,DSA,DSA,1024,t,3,t,update-service.ru,"CN=Legacy CA",2023-06-01,clientAuth,,suspicious
+MD5,RSA,RSA,768,t,7,t,secure-login.top,"CN=Unknown CA",2023-02-15,serverAuth,,malicious
+SHA-1,RSA,RSA,1024,t,1,t,banking-verify.net,"CN=Fake CA",2023-03-10,serverAuth,,suspicious
+SHA-256,RSA,RSA,2048,f,0,f,github.com,"CN=DigiCert TLS",2026-08-01,serverAuth,"*.github.com",benign
+SHA-512,RSA,RSA,4096,f,0,f,openai.com,"CN=GlobalSign",2026-07-15,serverAuth,"*.openai.com",benign
+SHA-256,RSA,RSA,2048,f,0,f,example.org,"CN=Let’s Encrypt",2025-12-31,serverAuth,"*.example.org",benign
+SHA-1,RSA,RSA,1024,t,4,t,login-secure.cn,"CN=Unknown",2023-11-01,serverAuth,,suspicious
+MD5,RSA,RSA,512,t,8,t,update-checker.biz,"CN=Untrusted",2023-09-01,codeSigning,,malicious
+SHA-1,RSA,RSA,1024,t,2,t,verify-account.co,"CN=Fake CA",2023-04-01,serverAuth,,suspicious

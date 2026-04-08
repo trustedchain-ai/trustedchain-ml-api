@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrustedChain | Certificate Scanner</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .help-text {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    .preset-buttons {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+    .preset-btn {
+      padding: 8px 16px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e2e8f0;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+    .preset-btn:hover {
+      background: #334155;
+      border-color: #475569;
+    }
+    .result-card {
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+    .result-benign {
+      background: #10b98126;
+      border: 1px solid #10b981;
+    }
+    .result-suspicious {
+      background: #f59e0b26;
+      border: 1px solid #f59e0b;
+    }
+    .result-malicious {
+      background: #ef444426;
+      border: 1px solid #ef4444;
+    }
+    .result-label {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .result-confidence {
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #475569;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .field-group {
+      background: #1e293b;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .field-group-title {
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #3b82f6;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">TC</div>
+        <div>
+          <p class="eyebrow">TrustedChain</p>
+          <h1>Certificate Scanner</h1>
+        </div>
+      </div>
+      <nav class="desktop-nav">
+        <a href="index.html">Back to Site</a>
+        <a href="ml.html">Research</a>
+      </nav>
+      <span class="pill">Protected</span>
+    </header>
+
+    <main>
+      <section class="admin glass admin-page">
+        <div class="section__header">
+          <p class="eyebrow">Quick Security Check</p>
+          <h3>Scan a Certificate for Threats</h3>
+          <p class="muted">Enter certificate details below to check if it's safe or suspicious</p>
+        </div>
+
+        <form id="authForm" class="login-form">
+          <div class="login-grid">
+            <div class="field">
+              <label for="authUser">Username</label>
+              <input id="authUser" name="username" type="text" placeholder="" required />
+            </div>
+            <div class="field">
+              <label for="authPass">Password</label>
+              <input id="authPass" name="password" type="password" placeholder="" required />
+            </div>
+            <button type="submit" class="primary">Login</button>
+          </div>
+          <p id="authStatus" class="muted" aria-live="polite"></p>
+        </form>
+
+        <div id="playground" class="admin-data hidden" aria-live="polite">
+          <div class="preset-buttons">
+            <button class="preset-btn" onclick="loadPreset('benign_1')">✅ Benign #1</button>
+            <button class="preset-btn" onclick="loadPreset('benign_2')">✅ Benign #2</button>
+            <button class="preset-btn" onclick="loadPreset('benign_3')">✅ Benign #3</button>
+            <button class="preset-btn" onclick="loadPreset('benign_4')">✅ Benign #4</button>
+            <button class="preset-btn" onclick="loadPreset('benign_5')">✅ Benign #5</button>
+            <button class="preset-btn" onclick="loadPreset('suspicious_1')">⚠️ Suspicious #1</button>
+            <button class="preset-btn" onclick="loadPreset('suspicious_2')">⚠️ Suspicious #2</button>
+            <button class="preset-btn" onclick="loadPreset('suspicious_3')">⚠️ Suspicious #3</button>
+            <button class="preset-btn" onclick="loadPreset('suspicious_4')">⚠️ Suspicious #4</button>
+            <button class="preset-btn" onclick="loadPreset('suspicious_5')">⚠️ Suspicious #5</button>
+            <button class="preset-btn" onclick="loadPreset('clear')">🗑️ Clear All</button>
+          </div>
+
+          <form id="predictForm" class="login-form">
+            <div class="field-group">
+              <div class="field-group-title">Certificate Signature</div>
+              
+              <div class="field">
+                <label for="field-signature_hash_algo">Hash Algorithm</label>
+                <select id="field-signature_hash_algo" name="signature_hash_algo">
+                  <option value="">-- Select --</option>
+                  <option value="SHA-256">SHA-256 (Recommended)</option>
+                  <option value="SHA-1">SHA-1 (Weak)</option>
+                  <option value="MD5">MD5 (Insecure)</option>
+                  <option value="SHA-512">SHA-512 (Strong)</option>
+                  <option value="SHA-384">SHA-384 (Strong)</option>
+                </select>
+                <p class="help-text">Cryptographic hash used for signing</p>
+              </div>
+
+              <div class="field">
+                <label for="field-signature_key_algo">Signature Algorithm</label>
+                <select id="field-signature_key_algo" name="signature_key_algo">
+                  <option value="">-- Select --</option>
+                  <option value="RSA">RSA (Common)</option>
+                  <option value="ECDSA">ECDSA (Modern)</option>
+                  <option value="DSA">DSA (Legacy)</option>
+                </select>
+                <p class="help-text">Algorithm used to sign the certificate</p>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <div class="field-group-title">Public Key Details</div>
+              
+              <div class="field">
+                <label for="field-public_key_algo">Public Key Type</label>
+                <select id="field-public_key_algo" name="public_key_algo">
+                  <option value="">-- Select --</option>
+                  <option value="RSA">RSA</option>
+                  <option value="EC">Elliptic Curve (EC)</option>
+                  <option value="DSA">DSA</option>
+                </select>
+                <p class="help-text">Type of public key encryption</p>
+              </div>
+
+              <div class="field">
+                <label for="field-public_key_size">Key Size (bits)</label>
+                <input id="field-public_key_size" name="public_key_size" type="number" placeholder="2048" />
+                <p class="help-text">Larger keys are more secure (2048+ recommended)</p>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <div class="field-group-title">Certificate Authority</div>
+              
+              <div class="field">
+                <label for="field-can_issue">Can Issue Certificates?</label>
+                <select id="field-can_issue" name="can_issue">
+                  <option value="">-- Select --</option>
+                  <option value="f">No (End Certificate)</option>
+                  <option value="t">Yes (CA Certificate)</option>
+                </select>
+                <p class="help-text">Whether this cert can sign other certificates</p>
+              </div>
+
+              <div class="field">
+                <label for="field-pathlen">Path Length</label>
+                <input id="field-pathlen" name="pathlen" type="number" placeholder="0" />
+                <p class="help-text">Maximum depth in certificate chain</p>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <div class="field-group-title">Security Checks</div>
+              
+              <div class="field">
+                <label for="field-has_roca">ROCA Vulnerability</label>
+                <select id="field-has_roca" name="has_roca">
+                  <option value="">-- Select --</option>
+                  <option value="f">Not Vulnerable</option>
+                  <option value="t">Vulnerable (High Risk)</option>
+                </select>
+                <p class="help-text">Check if key is vulnerable to ROCA attack</p>
+              </div>
+            </div>
+
+            <details style="margin-top: 12px;">
+              <summary style="cursor: pointer; font-weight: 600; color: #3b82f6; padding: 12px 0;">
+                ➕ Advanced Details (Optional)
+              </summary>
+
+              <div class="field-group" style="margin-top: 12px;">
+                <div class="field-group-title">Identity & Trust</div>
+                
+                <div class="field">
+                  <label for="field-common_name">Common Name (Domain/Org)</label>
+                  <input id="field-common_name" name="common_name" type="text" placeholder="example.com" />
+                  <p class="help-text">Domain or organization name on the certificate</p>
+                </div>
+
+                <div class="field">
+                  <label for="field-issuer_dn">Issuer Distinguished Name</label>
+                  <input id="field-issuer_dn" name="issuer_dn" type="text" placeholder="CN=CA, O=Organization, C=US" />
+                  <p class="help-text">Who issued/signed this certificate</p>
+                </div>
+
+                <div class="field">
+                  <label for="field-not_after">Expiration Date</label>
+                  <input id="field-not_after" name="not_after" type="date" />
+                  <p class="help-text">When this certificate expires</p>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <div class="field-group-title">Usage & Extensions</div>
+                
+                <div class="field">
+                  <label for="field-eku">Extended Key Usage</label>
+                  <input id="field-eku" name="eku" type="text" placeholder="serverAuth, clientAuth" />
+                  <p class="help-text">What this certificate can be used for</p>
+                </div>
+
+                <div class="field">
+                  <label for="field-san">Subject Alternative Names</label>
+                  <input id="field-san" name="san" type="text" placeholder="*.example.com, example.org" />
+                  <p class="help-text">Additional domains covered by this cert</p>
+                </div>
+              </div>
+            </details>
+
+            <button type="submit" class="primary" style="margin-top: 16px; width: 100%;">
+              <span id="btnText">🔍 Scan Certificate</span>
+            </button>
+          </form>
+
+          <div id="resultContainer"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const authForm = document.getElementById('authForm');
+    const authStatus = document.getElementById('authStatus');
+    const playground = document.getElementById('playground');
+    const btnText = document.getElementById('btnText');
+    const resultContainer = document.getElementById('resultContainer');
+
+    const presets = {
+      benign_1: {
+        signature_hash_algo: 'SHA-256',
+        signature_key_algo: 'RSA',
+        public_key_algo: 'RSA',
+        public_key_size: 2048,
+        can_issue: 'f',
+        pathlen: 0,
+        has_roca: 'f',
+        common_name: 'google.com',
+        issuer_dn: 'CN=Google Trust Services, O=Google Trust Services LLC, C=US',
+        eku: 'serverAuth',
+        san: '*.google.com, google.com'
+      },
+      benign_2: {
+        signature_hash_algo: 'SHA-512',
+        signature_key_algo: 'RSA',
+        public_key_algo: 'RSA',
+        public_key_size: 4096,
+        can_issue: 'f',
+        pathlen: 0,
+        has_roca: 'f',
+        common_name: 'microsoft.com',
+        issuer_dn: 'CN=Microsoft RSA TLS CA, O=Microsoft Corporation, C=US',
+        eku: 'serverAuth',
+        san: '*.microsoft.com, microsoft.com'
+      },
+      benign_3: {
+        signature_hash_algo: 'SHA-384',
+        signature_key_algo: 'ECDSA',
+        public_key_algo: 'EC',
+        public_key_size: 256,
+        can_issue: 'f',
+        pathlen: 0,
+        has_roca: 'f',
+        common_name: 'apple.com',
+        issuer_dn: 'CN=Apple Public CA, O=Apple Inc., C=US',
+        eku: 'serverAuth',
+        san: '*.apple.com, apple.com'
+      },
+      benign_4: {
+        signature_hash_algo: 'SHA-256',
+        signature_key_algo: 'RSA',
+        public_key_algo: 'RSA',
+        public_key_size: 2048,
+        can_issue: 'f',
+        pathlen: 0,
+        has_roca: 'f',
+        common_name: 'amazon.com',
+        issuer_dn: 'CN=Amazon RSA 2048 M02, O=Amazon, C=US',
+        eku: 'serverAuth',
+        san: '*.amazon.com, amazon.com'
+      },
+      benign_5: {
+        signature_hash_algo: 'SHA-256',
+        signature_key_algo: 'RSA',
+        public_key_algo: 'RSA',
+        public_key_size: 3072,
+        can_issue: 'f',
+        pathlen: 0,
+        has_roca: 'f',
+        common_name: 'cloudflare.com',
+        issuer_dn: 'CN=Cloudflare Inc ECC CA-3, O=Cloudflare, Inc., C=US',
+        eku: 'serverAuth',
+        san: '*.cloudflare.com, cloudflare.com'
+      },
+      suspicious_1: {
+        signature_hash_algo: 'SHA-1',
+        signature_key_algo: 'RSA',
+        public_key_algo: 'RSA',
+        public_key_size: 1024,
+        can_issue: 't',
+        pathlen: 5,
+        has_roca: 't',
+        common_name: 'unknown-domain.xyz',
+        issuer_dn: 'CN=Unknown CA',
+        eku: 'anyExtendedKeyUsage',
+        san: ''
+      },
+      suspicious_2: {
+        signature_hash_algo: 'MD5',
+        signature_key_algo: 'RSA',
+        public_key_algo: 'RSA',
+        public_key_size: 512,
+        can_issue: 't',
+        pathlen: 10,
+        has_roca: 't',
+        common_name: 'free-downloads.biz',
+        issuer_dn: 'CN=Untrusted Authority',
+        eku: 'codeSigning',
+        san: ''
+      },
+      suspicious_3: {
+        signature_hash_algo: 'SHA-1',
+        signature_key_algo: 'DSA',
+        public_key_algo: 'DSA',
+        public_key_size: 1024,
+        can_issue: 't',
+        pathlen: 3,
+        has_roca: 't',
+        common_name: 'update-service.ru',
+        issuer_dn: 'CN=Legacy CA',
+        eku: 'clientAuth',
+        san: ''
+      },
+      suspicious_4: {
+        signature_hash_algo: 'MD5',
+        signature_key_algo: 'RSA',
+        public_key_algo: 'RSA',
+        public_key_size: 768,
+        can_issue: 't',
+        pathlen: 7,
+        has_roca: 't',
+        common_name: 'secure-login.top',
+        issuer_dn: 'CN=Unknown CA',
+        eku: 'serverAuth',
+        san: ''
+      },
+      suspicious_5: {
+        signature_hash_algo: 'SHA-1',
+        signature_key_algo: 'RSA',
+        public_key_algo: 'RSA',
+        public_key_size: 1024,
+        can_issue: 't',
+        pathlen: 1,
+        has_roca: 't',
+        common_name: 'banking-verify.net',
+        issuer_dn: 'CN=Fake CA',
+        eku: 'serverAuth',
+        san: ''
+      }
+    };
+
+    function loadPreset(type) {
+      if (type === 'clear') {
+        document.querySelectorAll('#predictForm input, #predictForm select').forEach(el => {
+          if (el.type === 'number') el.value = '';
+          else if (el.tagName === 'SELECT') el.selectedIndex = 0;
+          else el.value = '';
+        });
+        return;
+      }
+      const preset = presets[type];
+      Object.keys(preset).forEach(key => {
+        const el = document.getElementById(`field-${key}`);
+        if (el) el.value = preset[key];
+      });
+    }
+
+    function getAuthHeader() {
+      const token = sessionStorage.getItem('basicAuth');
+      return token ? { Authorization: `Basic ${token}` } : {};
+    }
+
+    authForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const username = document.getElementById('authUser').value;
+      const password = document.getElementById('authPass').value;
+      const token = btoa(`${username}:${password}`);
+      sessionStorage.setItem('basicAuth', token);
+      
+      try {
+        const res = await fetch('/api/models', { headers: getAuthHeader() });
+        if (!res.ok) throw new Error('Auth failed');
+        playground.classList.remove('hidden');
+        authForm.classList.add('hidden');
+        authStatus.textContent = '';
+      } catch (err) {
+        authStatus.textContent = '❌ Invalid credentials';
+        sessionStorage.removeItem('basicAuth');
+      }
+    });
+
+    document.getElementById('predictForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      btnText.innerHTML = '<span class="loading"></span> Scanning...';
+      resultContainer.innerHTML = '';
+
+      const payload = {
+        model: 'lightgbm',
+        features: {},
+      };
+
+      document.querySelectorAll('#predictForm input, #predictForm select').forEach((input) => {
+        if (input.value === '' || input.value === '-- Select --') return;
+        let value = input.value;
+        if (input.type === 'number') {
+          value = Number(value);
+        }
+        payload.features[input.name] = value;
+      });
+
+      try {
+        const res = await fetch('/api/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader(),
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        displayResult(data);
+      } catch (err) {
+        resultContainer.innerHTML = '<div class="card"><p style="color:#ef4444;">❌ Scan failed. Please try again.</p></div>';
+      } finally {
+        btnText.textContent = '🔍 Scan Certificate';
+      }
+    });
+
+    function displayResult(data) {
+      const label = data.label || 'unknown';
+      const probs = data.probabilities || {};
+      const confidence = Math.max(...Object.values(probs)) * 100;
+      
+      let className = 'result-card';
+      let icon = '❓';
+      let message = '';
+      
+      if (label === 'benign') {
+        className += ' result-benign';
+        icon = '✅';
+        message = 'This certificate appears safe and trustworthy.';
+      } else if (label === 'suspicious') {
+        className += ' result-suspicious';
+        icon = '⚠️';
+        message = 'This certificate shows suspicious characteristics. Use caution.';
+      } else if (label === 'malicious') {
+        className += ' result-malicious';
+        icon = '🚨';
+        message = 'This certificate is likely malicious. Do not trust!';
+      }
+
+      resultContainer.innerHTML = `
+        <div class="${className}">
+          <div class="result-label">${icon} ${label.toUpperCase()}</div>
+          <div>${message}</div>
+          <div class="result-confidence">Confidence: ${confidence.toFixed(1)}%</div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
