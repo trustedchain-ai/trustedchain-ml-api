@@ -183,15 +183,23 @@ See:
 
 ---
 
-## Research Context & Novel Work
+## Research Context & Contributions
 
-TrustedChain is built on the idea that **certificate-level signals** can predict malware risk **before binaries execute**. The research explored how cryptographic choices, issuer lineage, and certificate constraints correlate with abuse at scale.
+TrustedChain is based on the idea that certificate-level signals can be used to predict malicious activity before execution. This work explores how cryptographic properties, issuer relationships, and certificate constraints correlate with abuse patterns at scale.
 
-Key contributions:
-- Demonstrated that **certificate reputation** is a viable early-warning signal for malware detection.
-- Validated that **gradient boosting models** consistently outperform other approaches on large-scale certificate data.
-- Showed that a **compact feature set** can achieve strong accuracy while keeping inference fast.
-- Proposed a practical, deployable pipeline that bridges **academic research** with **operational security use-cases**.
+### Key Contributions
+
+- **Early Detection Signal**  
+  Shows that certificate reputation can serve as a practical early indicator for malware detection.
+
+- **Model Performance**  
+  Demonstrates that gradient boosting models consistently perform well on large-scale certificate data.
+
+- **Efficient Feature Design**  
+  Confirms that a compact set of features can achieve strong accuracy while keeping inference fast.
+
+- **Practical Application**  
+  Presents a deployable pipeline that connects research with real-world security use cases.
 
 ---
 
