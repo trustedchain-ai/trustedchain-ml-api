@@ -6,6 +6,14 @@ Certificate reputation scoring for malware detection. This repo contains:
 - **Training script** for a lightweight LightGBM model
 - **Data sample** (anonymized, includes malicious labels)
 
+## Dataset (from `trustedchain.ai/ml.html`)
+- **Size:** 5M labeled certificates (benign / suspicious / malicious)
+- **Sources:** crt.sh + malware telemetry feeds
+- **Labels:**
+  - **Benign**: trusted issuers, no malware association
+  - **Suspicious**: mixed signals (unusual crypto, new issuers)
+  - **Malicious**: confirmed malware signing
+
 ## Features (12 key signals)
 - signature_hash_algo
 - signature_key_algo
@@ -19,6 +27,25 @@ Certificate reputation scoring for malware detection. This repo contains:
 - not_after
 - eku
 - san
+
+## Training Methods Evaluated (from `trustedchain.ai/ml.html`)
+We benchmarked multiple models before selecting a lightweight LightGBM variant:
+- Logistic Regression
+- Random Forest
+- Extra Trees
+- Gradient Boosting (sklearn)
+- HistGradientBoosting (sklearn)
+- XGBoost
+- LightGBM
+- MLP (Neural Network)
+
+## Reported Research Results
+From the research page, gradient boosting methods achieve **~97.3% accuracy**.
+Best-performing methods:
+- **Gradient Boosting:** 97.32% accuracy
+- **HistGradientBoosting:** 97.32% accuracy
+- **XGBoost:** 97.31% accuracy
+- **LightGBM:** 97.32% accuracy (train time ~4.14s)
 
 ## Quick Start (Local)
 ```bash
