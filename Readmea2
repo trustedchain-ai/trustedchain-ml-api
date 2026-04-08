@@ -1,0 +1,217 @@
+Here’s a clean, enhanced, professional README (Markdown-ready) — improved wording, better structure, stronger positioning, and clearer developer experience 👇
+
+⸻
+
+
+# 🔐 TrustedChain ML API
+
+AI-powered certificate reputation scoring for malware detection.
+
+This repository provides a lightweight, production-ready machine learning system for analyzing X.509 certificates and identifying malicious or suspicious activity.
+
+---
+
+## 🚀 Overview
+
+TrustedChain combines machine learning and threat intelligence to classify certificates into:
+
+- **Benign**
+- **Suspicious**
+- **Malicious**
+
+The system is designed to be:
+- Fast (low-latency inference)
+- Lightweight (efficient models)
+- Explainable (clear feature signals)
+- Easy to integrate (HTTP API)
+
+---
+
+## 📦 What’s Included
+
+- 🌐 **HTTP API** for real-time predictions  
+- 🧪 **Model playground UI** for testing and experimentation  
+- 🤖 **Training pipeline** (LightGBM-based)  
+- 📊 **Sample dataset** (anonymized with labels)  
+
+---
+
+## 📊 Dataset
+
+Source: [trustedchain.ai/ml.html](https://trustedchain.ai/ml.html)
+
+- **Size:** ~5M labeled certificates  
+- **Sources:**
+  - Certificate Transparency logs (crt.sh)
+  - Malware telemetry feeds  
+
+### Labels
+
+- **Benign**  
+  Trusted issuers with no known malicious association  
+
+- **Suspicious**  
+  Mixed signals (e.g., unusual cryptography, new or untrusted issuers)  
+
+- **Malicious**  
+  Confirmed association with malware infrastructure or abuse  
+
+---
+
+## 🧠 Features (Core Signals)
+
+The model is trained on 12 key certificate features:
+
+- `signature_hash_algo`
+- `signature_key_algo`
+- `public_key_algo`
+- `public_key_size`
+- `can_issue`
+- `pathlen`
+- `has_roca`
+- `common_name`
+- `issuer_dn`
+- `not_after`
+- `eku`
+- `san`
+
+These features capture both **cryptographic properties** and **certificate structure patterns**.
+
+---
+
+## ⚙️ Model Selection
+
+Multiple models were evaluated before selecting LightGBM as the default due to its performance and efficiency.
+
+### Evaluated Models
+
+- Logistic Regression  
+- Random Forest  
+- Extra Trees  
+- Gradient Boosting (sklearn)  
+- HistGradientBoosting (sklearn)  
+- XGBoost  
+- LightGBM  
+- MLP (Neural Network)  
+
+---
+
+## 📈 Performance
+
+Based on internal benchmarking:
+
+| Model                    | Accuracy |
+|--------------------------|----------|
+| Gradient Boosting        | 97.32%   |
+| HistGradientBoosting     | 97.32%   |
+| XGBoost                  | 97.31%   |
+| LightGBM (selected)      | 97.32%   |
+
+**LightGBM** was selected for:
+- Fast training (~4 seconds)
+- Low resource usage
+- Strong performance on tabular data
+
+---
+
+## 🏁 Quick Start
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+Start API
+
+python server.py
+
+Open UI
+
+open http://localhost:4173/model.html
+
+
+⸻
+
+🔮 Prediction API
+
+Endpoint
+
+POST /api/predict
+
+Example Request
+
+{
+  "model": "lightgbm",
+  "features": {
+    "signature_hash_algo": "SHA-256",
+    "signature_key_algo": "RSA",
+    "public_key_algo": "RSA",
+    "public_key_size": 2048,
+    "can_issue": "f",
+    "pathlen": 0,
+    "has_roca": "f",
+    "common_name": "google.com",
+    "issuer_dn": "CN=Google Trust Services",
+    "eku": "serverAuth",
+    "san": "*.google.com"
+  }
+}
+
+Example Response
+
+{
+  "classification": "benign",
+  "confidence": 0.97,
+  "model": "lightgbm"
+}
+
+
+⸻
+
+🧪 Training
+
+Training scripts and configuration:
+	•	train_model.py
+	•	MODEL.md
+
+Supports:
+	•	Model retraining
+	•	Feature experimentation
+	•	Performance benchmarking
+
+⸻
+
+📁 Data Sample
+
+See:
+
+data/DATA_SAMPLE.csv
+
+	•	Anonymized dataset
+	•	Includes labels
+	•	Safe for testing and development
+
+⸻
+
+⚠️ Notes
+	•	No secrets or sensitive data are included
+	•	Environment variables can be configured via:
+	•	.env
+	•	system environment
+	•	systemd (production)
+
+⸻
+
+🧭 Roadmap (Future Work)
+	•	Explainable AI (feature-level insights)
+	•	Certificate graph analysis
+	•	Real-time threat intelligence ingestion
+	•	API scaling & deployment
+	•	Advanced model experimentation
+
+⸻
+
+📌 Summary
+
+TrustedChain ML API is a lightweight, AI-powered system for certificate reputation scoring, designed to detect malicious TLS activity using structured certificate data and machine learning.
+
