@@ -183,10 +183,15 @@ See:
 
 ---
 
-## Notes
+## Research Context & Novel Work
 
-- No secrets or sensitive data are included
-- Environment variables can be configured via `.env`, system environment, or systemd
+TrustedChain is built on the idea that **certificate-level signals** can predict malware risk **before binaries execute**. The research explored how cryptographic choices, issuer lineage, and certificate constraints correlate with abuse at scale.
+
+Key contributions:
+- Demonstrated that **certificate reputation** is a viable early-warning signal for malware detection.
+- Validated that **gradient boosting models** consistently outperform other approaches on large-scale certificate data.
+- Showed that a **compact feature set** can achieve strong accuracy while keeping inference fast.
+- Proposed a practical, deployable pipeline that bridges **academic research** with **operational security use-cases**.
 
 ---
 
@@ -202,4 +207,6 @@ See:
 
 ## Contact
 
-Assaf@trustedchain.ai
+For research collaboration, partnerships, or integration requests:
+
+**Assaf@trustedchain.ai**
